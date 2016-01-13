@@ -1,0 +1,79 @@
+= Current Issue =
+
+get_comments doesnt let you modify the depth. looks like we need a different
+library
+ 
+== Sub Issue ==
+I cannot seem to get the info for the comment I just posted, even if I wait for
+half a minute.
+
+I need this info so i can use the get_comments(permlink) method
+
+starting comment madlibbot2015
+state file /home/jmate/Desktop/RedditMadLib/state.csv
+session file /home/jmate/Desktop/RedditMadLib/session.json
+already logged in
+Blanks:
+1: NOUN (PLURAL)
+2: OCCUPATION
+3: ANIMAL (PLURAL)
+4: PLACE
+5: VERB
+6: NOUN
+Text:
+1: In the book 'War of the {1}', the main character is an
+2: anonymous {2} who records the arrival of {3}
+3: in {4}. Needless to say, havoc reigns as the {3}
+4: continue to {5} everything in sight, until they are killed
+posted with comment id t1_cw37m03
+Request error: HTTP 404 Not Found at /home/jmate/perl5/lib/perl5/Reddit/Client.pm line 159.
+
+= Setup =
+1. run git update-index --assume-unchanged config
+		1. this is so you don't accientally commit your username/password to the repo
+2. modify config with your bot's username and password
+3. I'm using the Reddit:Client library available from CPAN. (to understand how it work this blog was valuable: http://perltricks.com/article/151/2015/2/9/Build-a-Reddit-bot-with-Perl)
+
+== Install Perl Dependencies ==
+=== If you don't have a local perl5 lib directory
+mkdir -p ~/lib/perl5
+perl -MCPAN -e shell
+cpan> o conf makepl_arg 'PREFIX=~/lib/perl5'
+vim ~/.bashrc
+export PER5LIB=~/lib/perl5
+=== After you have a local perl5 lib directory
+cpan> install Reddit::Client
+
+
+= TODO =
+
+1. DONE create subreddit for testing and linking (https://www.reddit.com/r/madlibbot/)
+2. DONE create bot account (https://www.reddit.com/user/madlibbot2015/)
+3. DONE load account config from bin/config
+
+== Starting New ==
+1. DONE bot operator gives the bot a seed/starting comment and story
+2. DONE bot replies to the seed with intro and first variable
+3. SKIPPED STATE FILE: append created comment id/url
+4. STUCK wait for first reply
+5. state: append reply
+6. reply with next variable (unless done, go to last step)
+7. state: append created comment id/url
+8. wait for first reply
+5. state: append reply
+9. goto 6.
+10. reply with resulting story
+11. edit original seed comment with story
+12. post story and link to seed comment to /r/madlibbot
+
+
+== Continuing After Shutdown ==
+1. load state from previous run
+2. go to next step
+
+
+= Origin/History =
+Idea came from:
+https://www.reddit.com/user/BoozeoisPig
+https://www.reddit.com/r/videos/comments/3oxfpz/mad_lib_madness/cw1m6ja
+
