@@ -6,6 +6,11 @@ use Try::Tiny;
 use Time::Piece;
 use Getopt::Long;
 
+use FindBin;
+use lib $FindBin::Bin;
+use util;
+
+
 my $bin=`dirname "$0"`;
 $bin =~ s/\R//g;
 $bin=`readlink -f $bin`;
@@ -35,21 +40,14 @@ sub usage {
 	die;
 }
 
-sub check {
-  my $name = $_[0];
-  my $val = $_[1];
-    
-  if(not defined $val) {           
-    usage("-$name missing"); 
-  }
-}   
-
+###################################
 # parsing arguments
+###################################
 my $madlib;
-my $configLoc;
+my $configLoc="$bin/config";
 my $start;
-my $state;
-my $session;
+my $state="$bin/state.csv";
+my $session="$bin/session.json";
 my $help=0;
 GetOptions (
 	"madlib=s" => \$madlib,
@@ -62,48 +60,22 @@ GetOptions (
 if($help){
 	usage("-help flag provided");
 }
-check("start_comment", $start);
-check("madlib", $madlib);
-if(not defined $state){
-	$state="$bin/state.csv";
-}
-if(not defined $configLoc){
-	$configLoc="$bin/config";
-}
-if(not defined $session){
-	$session="$bin/session.json";
-}
+util::check("start_comment", $start, \&usage);
+util::check("madlib", $madlib, \&usage);
 
 
-# Read username and password from config file
+###############################################
+# Login
+###############################################
 if(not -e $configLoc) {
 	usage("Was expecting the config file at $configLoc but was not found");
 }
-open my $fhAccount, "<", $configLoc or die $!;
-my $username = <$fhAccount>;
-$username =~ s/\R//g;
-my $password = <$fhAccount>;
-$password =~ s/\R//g;
-close($fhAccount);
+my $reddit = util::login($configLoc, $session);
 
-print "starting comment $username\n";
-print "state file $state\n";
-print "session file $session\n";
 
-my $reddit = Reddit::Client->new(
-	session_file => $session,
-	user_agent   => 'madlibbot/v0.01',
-);  
-
-if ( $reddit->is_logged_in ) { 
-	print "already logged in\n";
-} else {
-	print "logging in because session state is stale or doesn't exist\n";
-	$reddit->login( $username,  $password);
-	$reddit->save_session();
-}   
-
+###############################################
 #Load the madlib file
+###############################################
 open my $fhMadlib, "<", $madlib or die $!;
 my @blankTypes=();
 my @text=();
